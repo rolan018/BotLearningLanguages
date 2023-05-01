@@ -78,7 +78,8 @@ class Command(BaseCommand):
                     reply_markup=markup)
                 await FSMAdmin.next()
             else:
-                await message.answer(text="Пожалуйста, укажи только имя (без пробелов)")
+                await message.answer(text="Пожалуйста, укажи только имя (<s>без пробелов</s>)",
+                                     parse_mode='HTML')
 
         # Ловим шестой ответ
         @dp.message_handler(content_types=['contact', 'text'], state=FSMAdmin.number)
@@ -98,9 +99,10 @@ class Command(BaseCommand):
                 remove_keyboard = types.ReplyKeyboardRemove()
                 await message.answer(text='и ещё email pls 😁', reply_markup=remove_keyboard)
             else:
-                await message.answer(
-                    text="Вы ввели неверный номер телефона.\nПожалуйста введите номер телефона в формате +7xxxxxxxxxx."+
-                         "\nИли воспользуйтесь кнопкой: Отправить контакт")
+                await message.answer(text="Вы ввели неверный номер телефона\n" +
+                                          "Пожалуйста введите номер телефона в формате +7xxxxxxxxxx\n" +
+                                          "Или воспользуйтесь кнопкой: <i>Отправить контакт</i>",
+                                     parse_mode='HTML')
 
         @dp.message_handler(state=FSMAdmin.post)
         async def get_un_name(message: types.Message, state: FSMContext):
@@ -124,7 +126,9 @@ class Command(BaseCommand):
                 await message.answer(text='Отлично, давай приступим к обучению', reply_markup=markup)
                 await FSMAdmin.next()
             else:
-                await message.answer(text="Вы ввели неверно вашу почту.\nУкажите почту в формате: example@gmail.com")
+                await message.answer(text="Вы ввели неверно вашу почту\n" +
+                                          "Укажите почту в формате: <i>example@gmail.com</i>",
+                                     parse_mode='HTML')
 
         '''*********************** Начало ****************************'''
 
@@ -172,7 +176,7 @@ class Command(BaseCommand):
                                                text=text).save)()
             markup = get_standard_markup()
             await FSMAdmin.action.set()
-            await message.answer(text='Отлично, слово записано.\nВыбирите, что ещё хотите сделать', reply_markup=markup)
+            await message.answer(text='Отлично, слово записано\nВыбирите, что ещё хотите сделать', reply_markup=markup)
 
         # Заполнение урока
         @dp.message_handler(lambda message: message.text == "Новый урок", state=FSMAdmin.action)
@@ -210,10 +214,10 @@ class Command(BaseCommand):
                                                      mark=int(data['lesson_mark'])).save)()
                 markup = get_standard_markup()
                 await FSMAdmin.action.set()
-                await message.answer(text='Урок записан.\nВыбирите, что ещё хотите сделать', reply_markup=markup)
+                await message.answer(text='Урок записан\nВыбирите, что ещё хотите сделать', reply_markup=markup)
             else:
                 await message.reply(
-                    text="Сорри, воспользуйся кнопкой пожалуйста.\nКнопки находятся над клавиатурой, слева от значка 🎤")
+                    text="Сорри, воспользуйся кнопкой пожалуйста\nКнопки находятся над клавиатурой, слева от значка 🎤")
 
         # Заполнение материала
         @dp.message_handler(lambda message: message.text == "Новый материал", state=FSMAdmin.action)
@@ -251,10 +255,10 @@ class Command(BaseCommand):
                                                        mark=int(data['material_mark'])).save)()
                 markup = get_standard_markup()
                 await FSMAdmin.action.set()
-                await message.answer(text='Материал записан.\nВыбирите, что ещё хотите сделать', reply_markup=markup)
+                await message.answer(text='Материал записан\nВыбирите, что ещё хотите сделать', reply_markup=markup)
             else:
                 await message.reply(
-                    text="Сорри, воспользуйся кнопкой пожалуйста.\nКнопки находятся над клавиатурой, слева от значка 🎤")
+                    text="Сорри, воспользуйся кнопкой пожалуйста\nКнопки находятся над клавиатурой, слева от значка 🎤")
 
         # Вывод Слов
         @dp.message_handler(lambda message: message.text == "Посмотреть все слова", state=FSMAdmin.action)
@@ -262,7 +266,8 @@ class Command(BaseCommand):
             async with state.proxy() as data:
                 async for Words in ActionWord.objects.filter(telegram_id=data['telegram_id']):
                     word_text = Words.text
-                    await message.answer(f'{word_text}')
+                    await message.answer(f'<i>{word_text}</i>',
+                                         parse_mode='HTML')
             # варианты ответа
             markup = get_standard_markup()
             await FSMAdmin.action.set()
@@ -279,7 +284,10 @@ class Command(BaseCommand):
                     material_topic = Materials.topic
                     material_url = Materials.url
                     material_mark = Materials.mark
-                    await message.answer(f'{item}){material_topic}.\nURL:{material_url}\nОЦЕНКА:{material_mark}')
+                    await message.answer(f'{item})<i>{material_topic}</i>\n' +
+                                         f'<b>URL</b>:<a href="{material_url}">Ссылка на источник </a>\n' +
+                                         f'<b>ОЦЕНКА</b>:<b>{material_mark}</b>',
+                                         parse_mode='HTML')
             # варианты ответа
             markup = get_standard_markup()
             await FSMAdmin.action.set()
@@ -296,7 +304,10 @@ class Command(BaseCommand):
                     lesson_topic = Lessons.topic
                     lesson_date = Lessons.date
                     lesson_mark = Lessons.mark
-                    await message.answer(f'{item}){lesson_topic}.\nДАТА УРОКА:{lesson_date}\nОЦЕНКА:{lesson_mark}')
+                    await message.answer(f'{item})<i>{lesson_topic}</i>\n' +
+                                         f'<b>ДАТА УРОКА</b>:<i>{lesson_date}</i>\n' +
+                                         f'<b>ОЦЕНКА</b>:<b>{lesson_mark}</b>',
+                                         parse_mode='HTML')
             # варианты ответа
             markup = get_standard_markup()
             await FSMAdmin.action.set()
@@ -310,7 +321,8 @@ class Command(BaseCommand):
             async with state.proxy() as data:
                 res = await sync_to_async(ActionWord.objects.filter(telegram_id=data['telegram_id']).count)()
             markup = get_standard_markup()
-            await message.answer(f'Всего слов: {res}')
+            await message.answer(f'Всего слов: <b>{res}</b>',
+                                 parse_mode='HTML')
             await FSMAdmin.action.set()
             await message.answer(text='Выбирите, что ещё хотите сделать',
                                  reply_markup=markup)
