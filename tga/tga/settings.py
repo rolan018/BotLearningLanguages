@@ -27,7 +27,7 @@ BOT_TOKEN = str(os.getenv("SECRET_KEY"))
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-)=z!ht60w@7yq=iom!0e^4+*ebh&39k5&$+maf#l^7555tv&*$"
+SECRET_KEY = "******"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
